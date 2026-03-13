@@ -1,114 +1,162 @@
 // src/pages/Home.tsx
-import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../services/Firebase";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import SearchBar from "../components/SearchBar/SearchBar";
+import CategorySection from "../components/CategorySection/CategorySection";
+import { Movie } from "../types/Movie";
 
-interface Movie {
-  id: string;
-  tmdbId: number;
-  title: string;
-  overview: string;
-  poster_path: string;
-  release_date: string;
-  trailerKey?: string | null;
-}
+const TMDB_KEY = process.env.REACT_APP_TMDB_API_KEY;
+const BASE_URL = "https://api.themoviedb.org/3";
+const categories = ["Action", "Drama", "Comedy", "Adventure"];
 
 const Home = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [autocompleteResults, setAutocompleteResults] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedTrailer, setSelectedTrailer] = useState<string | null>(null);
+  const navigate = useNavigate();
 
+  // Fetch initial random popular movies on page load
   useEffect(() => {
-    const fetchMovies = async () => {
-      const snapshot = await getDocs(collection(db, "movies"));
-      const movieList = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as Omit<Movie, "id">),
-      }));
-      setMovies(movieList);
-      setLoading(false);
-    };
     fetchMovies();
   }, []);
 
-  if (loading) return <h2>Loading movies...</h2>;
+  const fetchMovies = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(
+        `${BASE_URL}/movie/popular?api_key=${TMDB_KEY}&language=en-US&page=1`
+      );
+      const results = res.data.results;
+
+      const moviesWithGenres: Movie[] = results.map((movie: any) => ({
+        id: movie.id,
+        title: movie.title,
+        overview: movie.overview,
+        poster_path: movie.poster_path,
+        release_date: movie.release_date,
+        genres: movie.genre_ids.map((id: number) => {
+          const map: { [key: number]: string } = {
+            28: "Action",
+            12: "Adventure",
+            16: "Animation",
+            35: "Comedy",
+            80: "Crime",
+            18: "Drama",
+            10751: "Family",
+            14: "Fantasy",
+            27: "Horror",
+          };
+          return map[id] || "Other";
+        }),
+      }));
+
+      setMovies(moviesWithGenres);
+      setLoading(false);
+    } catch (err) {
+      console.error(err);
+      setLoading(false);
+    }
+  };
+
+  // Live search: fetch from TMDB API
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      setAutocompleteResults([]);
+      return;
+    }
+
+    try {
+      const res = await axios.get(
+        `${BASE_URL}/search/movie?api_key=${TMDB_KEY}&language=en-US&query=${query}&page=1`
+      );
+      const results = res.data.results;
+
+      const moviesWithPoster: Movie[] = results.map((movie: any) => ({
+        id: movie.id,
+        title: movie.title,
+        poster_path: movie.poster_path,
+        overview: movie.overview,
+        release_date: movie.release_date,
+        genres: [],
+      }));
+
+      setAutocompleteResults(moviesWithPoster);
+    } catch (err) {
+      console.error("Search error:", err);
+      setAutocompleteResults([]);
+    }
+  };
+
+  const handleSelectMovie = (movieId: number) => {
+    navigate(`/movie/${movieId}`);
+    setSearchQuery("");
+    setAutocompleteResults([]);
+  };
+
+  const moviesByCategory = (category: string) =>
+    movies.filter((movie) => movie.genres.includes(category));
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Popular Movies</h1>
+    <div style={{ padding: "20px", backgroundColor: "#fff", minHeight: "100vh" }}>
+      <h1 style={{ color: "#000", marginBottom: "20px" }}>Discover Movies</h1>
 
-      {/* Movie Grid */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-        {movies.map((movie) => (
+      <div style={{ position: "relative", maxWidth: "400px", marginBottom: "20px" }}>
+        <SearchBar value={searchQuery} onSearch={handleSearch} />
+
+        {autocompleteResults.length > 0 && (
           <div
-            key={movie.id}
             style={{
-              width: "200px",
-              cursor: movie.trailerKey ? "pointer" : "default",
-              textAlign: "center",
+              position: "absolute",
+              top: "40px",
+              left: 0,
+              width: "100%",
+              backgroundColor: "#f1f1f1",
+              borderRadius: "8px",
+              maxHeight: "300px",
+              overflowY: "auto",
+              zIndex: 1000,
+              boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
             }}
-            onClick={() => movie.trailerKey && setSelectedTrailer(movie.trailerKey)}
           >
-            <img
-              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-              alt={movie.title}
-              style={{ width: "100%", borderRadius: "8px" }}
-            />
-            <h3 style={{ fontSize: "16px", margin: "8px 0 4px" }}>{movie.title}</h3>
-            <p style={{ fontSize: "14px", color: "#888" }}>{movie.release_date}</p>
+            {autocompleteResults.map((movie) => (
+              <div
+                key={movie.id}
+                onClick={() => handleSelectMovie(movie.id)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "8px",
+                  cursor: "pointer",
+                  borderBottom: "1px solid #ddd",
+                }}
+              >
+                {movie.poster_path && (
+                  <img
+                    src={`https://image.tmdb.org/t/p/w92${movie.poster_path}`}
+                    alt={movie.title}
+                    style={{ width: "40px", borderRadius: "4px" }}
+                  />
+                )}
+                <span style={{ color: "#000" }}>{movie.title}</span>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
       </div>
 
-      {/* Modal Trailer */}
-      {selectedTrailer && (
-        <div
-          onClick={() => setSelectedTrailer(null)} // close when clicking outside
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            backgroundColor: "rgba(0,0,0,0.85)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside iframe
-            style={{ position: "relative" }}
-          >
-            <iframe
-              width="900"
-              height="506"
-              src={`https://www.youtube.com/embed/${selectedTrailer}?autoplay=1`}
-              title="Movie Trailer"
-              allow="autoplay; fullscreen"
-              style={{ borderRadius: "8px" }}
-            ></iframe>
-            <button
-              onClick={() => setSelectedTrailer(null)}
-              style={{
-                position: "absolute",
-                top: "-40px",
-                right: "0",
-                padding: "8px 12px",
-                background: "#ff3d00",
-                color: "#fff",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-            >
-              X
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Category sections */}
+      {categories.map((category) => (
+        <CategorySection
+          key={category}
+          title={category}
+          movies={moviesByCategory(category)}
+          onMovieClick={(movieId: number | string) => navigate(`/movie/${movieId}`)}
+        />
+      ))}
     </div>
   );
 };
