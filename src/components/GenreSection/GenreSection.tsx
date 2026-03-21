@@ -67,7 +67,7 @@ const GenreSection: React.FC<GenreSectionProps> = ({ title, fetchUrl, onMovieCli
 
   return (
     <div style={{ marginBottom: "40px", padding: "0 20px" }}>
-      <h2 style={{ color: "#fff", marginBottom: "15px", fontSize: "1.5rem", fontWeight: "bold" }}>{title}</h2>
+      <h2 style={{ color: "var(--text-primary)", marginBottom: "15px", fontSize: "1.5rem", fontWeight: "bold" }}>{title}</h2>
       
       <div 
         style={{
@@ -93,7 +93,7 @@ const GenreSection: React.FC<GenreSectionProps> = ({ title, fetchUrl, onMovieCli
             );
           }
         })}
-        {loading && <div style={{ minWidth: "160px", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>Loading...</div>}
+        {loading && <div style={{ minWidth: "160px", color: "var(--text-secondary)", display: "flex", alignItems: "center", justifyContent: "center" }}>Loading...</div>}
       </div>
     </div>
   );

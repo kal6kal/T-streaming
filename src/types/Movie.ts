@@ -7,4 +7,6 @@ export interface Movie {
   release_date: string;
   trailerKey?: string | null;
   genres: string[];
+  rating?: number;
+  cast?: string[];
 }

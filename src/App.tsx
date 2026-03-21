@@ -4,27 +4,30 @@ import PrivateRoute from "./components/PrivateRoute";
 
 import Home from "./pages/Home";
 import MovieDetails from "./pages/MovieDetails/MovieDetails";
-import Profile from "./pages/Profile";
 import Fav from "./pages/Fav";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
+import { FavProvider } from "./context/FavContext";
 
 // Replace with a dynamic or hosted image in production
 const BG_IMAGE_URL = "https://image.tmdb.org/t/p/original/9yTzXEIQ9mHWeQvM9bBfMawRjZg.jpg";
 
 function Layout({ children }: { children: React.ReactNode }) {
+  const { theme } = useTheme();
+
   return (
-    <div style={{
+    <div className={`app-container ${theme}`} style={{
       minHeight: "100vh",
-      backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(${BG_IMAGE_URL})`,
+      backgroundImage: `var(--bg-image-overlay), url(${BG_IMAGE_URL})`,
       backgroundSize: "cover",
       backgroundAttachment: "fixed",
       backgroundPosition: "center",
-      color: "#fff"
+      color: "var(--text-color)"
     }}>
       {/* Fixed Logo Example */}
       <div style={{ position: "fixed", top: "20px", left: "20px", zIndex: 1100 }}>
-         <h2 style={{ color: "#E50914", margin: 0, fontWeight: "bold", textShadow: "2px 2px 4px #000" }}>M-STREAMING</h2>
+         <h2 style={{ color: "var(--accent-color)", margin: 0, fontWeight: "bold", textShadow: "2px 2px 4px #000" }}>T-Stream</h2>
       </div>
       <Navbar />
       <div style={{ paddingTop: "80px" }}>
@@ -36,65 +39,62 @@ function Layout({ children }: { children: React.ReactNode }) {
 
 function App() {
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          {/* Redirect root to /home */}
-          <Route path="/" element={<Navigate to="/home" />} />
+    <ThemeProvider>
+      <FavProvider>
+        <Router>
+          <Layout>
+            <Routes>
+              {/* Redirect root to /home */}
+              <Route path="/" element={<Navigate to="/home" />} />
 
-          {/* Public routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+              {/* Public routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
-          {/* Protected routes */}
-          <Route
-            path="/home"
-            element={
-              <PrivateRoute>
-                <Home />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <PrivateRoute>
-                <Profile />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/fav"
-            element={
-              <PrivateRoute>
-                <Fav />
-              </PrivateRoute>
-            }
-          />
+              {/* Protected routes */}
+              <Route
+                path="/home"
+                element={
+                  <PrivateRoute>
+                    <Home />
+                  </PrivateRoute>
+                }
+              />
 
-          {/* Movie & TV Details page (protected) */}
-          <Route
-            path="/movie/:id"
-            element={
-              <PrivateRoute>
-                <MovieDetails />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/tv/:id"
-            element={
-              <PrivateRoute>
-                <MovieDetails />
-              </PrivateRoute>
-            }
-          />
+              <Route
+                path="/fav"
+                element={
+                  <PrivateRoute>
+                    <Fav />
+                  </PrivateRoute>
+                }
+              />
 
-          {/* Catch-all: redirect unknown routes to /home */}
-          <Route path="*" element={<Navigate to="/home" />} />
-        </Routes>
-      </Layout>
-    </Router>
+              {/* Movie & TV Details page (protected) */}
+              <Route
+                path="/movie/:id"
+                element={
+                  <PrivateRoute>
+                    <MovieDetails />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/tv/:id"
+                element={
+                  <PrivateRoute>
+                    <MovieDetails />
+                  </PrivateRoute>
+                }
+              />
+
+              {/* Catch-all: redirect unknown routes to /home */}
+              <Route path="*" element={<Navigate to="/home" />} />
+            </Routes>
+          </Layout>
+        </Router>
+      </FavProvider>
+    </ThemeProvider>
   );
 }
 

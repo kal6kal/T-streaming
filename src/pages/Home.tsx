@@ -1,9 +1,9 @@
-// src/pages/Home.tsx
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar/SearchBar";
 import GenreSection from "../components/GenreSection/GenreSection";
+import HeroBanner from "../components/HeroBanner/HeroBanner";
 import { Movie } from "../types/Movie";
 
 const TMDB_KEY = process.env.REACT_APP_TMDB_API_KEY;
@@ -14,7 +14,6 @@ const Home = () => {
   const [autocompleteResults, setAutocompleteResults] = useState<Movie[]>([]);
   const navigate = useNavigate();
 
-  // Live search: fetch from TMDB API
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
     if (!query.trim()) {
@@ -58,26 +57,29 @@ const Home = () => {
   };
 
   return (
-    <div style={{ padding: "20px", minHeight: "100vh" }}>
-      <h1 style={{ color: "#fff", marginBottom: "20px" }}>Discover</h1>
-
-      <div style={{ position: "relative", maxWidth: "400px", marginBottom: "20px", marginLeft: "20px" }}>
-        <SearchBar value={searchQuery} onSearch={handleSearch} />
+    <>
+      <HeroBanner />
+      <div style={{ padding: "30px 40px", minHeight: "100vh", position: "relative" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "30px" }}>
+        <h1 style={{ margin: 0, fontSize: "2.5rem" }}>Discover</h1>
+        
+        <div style={{ position: "relative", width: "400px", maxWidth: "100%", zIndex: 1000 }}>
+          <SearchBar value={searchQuery} onSearch={handleSearch} />
 
         {autocompleteResults.length > 0 && (
           <div
             style={{
               position: "absolute",
-              top: "40px",
+              top: "100%",
               left: 0,
               width: "100%",
-              backgroundColor: "#141414",
-              border: "1px solid #333",
+              backgroundColor: "var(--bg-secondary)",
+              border: "1px solid var(--border-color)",
               borderRadius: "8px",
-              maxHeight: "300px",
+              maxHeight: "350px",
               overflowY: "auto",
-              zIndex: 1000,
-              boxShadow: "0 4px 8px rgba(0,0,0,0.5)",
+              boxShadow: "var(--card-shadow)",
+              marginTop: "5px"
             }}
           >
             {autocompleteResults.map((item: any) => (
@@ -88,11 +90,14 @@ const Home = () => {
                   display: "flex",
                   alignItems: "center",
                   gap: "10px",
-                  padding: "8px",
+                  padding: "10px",
                   cursor: "pointer",
-                  borderBottom: "1px solid #333",
-                  color: "#fff"
+                  borderBottom: "1px solid var(--border-color)",
+                  color: "var(--text-primary)",
+                  transition: "background-color 0.2s"
                 }}
+                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "var(--border-color)")}
+                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
               >
                 {item.poster_path ? (
                   <img
@@ -108,9 +113,10 @@ const Home = () => {
             ))}
           </div>
         )}
+        </div>
       </div>
 
-      <GenreSection 
+      <GenreSection  
         title="Action Movies" 
         fetchUrl="/discover/movie?with_genres=28&language=en-US" 
         onMovieClick={handleCardClick} 
@@ -134,7 +140,8 @@ const Home = () => {
         onMovieClick={handleCardClick} 
         mediaType="movie" 
       />
-    </div>
+      </div>
+    </>
   );
 };
 
