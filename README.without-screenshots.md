@@ -1,37 +1,8 @@
 # T-Streaming
 
-<p align="center">
-  <img src="./public/logo.jpg" alt="T-Streaming logo" width="110" />
-</p>
+**Movie discovery & streaming-style UI powered by TMDB** — search, browse genres, open rich details, watch trailers, save favorites.
 
-<p align="center">
-  <strong>Movie discovery & streaming-style UI powered by TMDB</strong><br />
-  Search, browse genres, open rich details, watch trailers, save favorites.
-</p>
-
----
-
-## Screenshots
-
-Screenshots live in `src/assets/`. Paths below use URL encoding so spaces in filenames render correctly on GitHub.
-
-### Home
-
-<p align="center">
-  <img src="./src/assets/home%20page%20.png" alt="T-Streaming home page" width="88%" />
-</p>
-
-### Login
-
-<p align="center">
-  <img src="./src/assets/login%20page.png" alt="T-Streaming login page" width="88%" />
-</p>
-
-### Movie details
-
-<p align="center">
-  <img src="./src/assets/movie%20detail.png" alt="T-Streaming movie detail page" width="88%" />
-</p>
+This file is the same as the main README **without** embedded screenshots. Use it where image hosting or repo size matters, or paste into contexts that strip images.
 
 ---
 
@@ -124,4 +95,4 @@ MIT
 
 ---
 
-*Prefer a README without images? See [`README.without-screenshots.md`](./README.without-screenshots.md).*
+*Screenshots version: [`README.md`](./README.md).*
