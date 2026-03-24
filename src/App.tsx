@@ -44,22 +44,22 @@ function App() {
         <Router>
           <Layout>
             <Routes>
-              {/* Redirect root to /home */}
-              <Route path="/" element={<Navigate to="/home" />} />
-
-              {/* Public routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-
-              {/* Protected routes */}
+              {/* Homepage */}
               <Route
-                path="/home"
+                path="/"
                 element={
                   <PrivateRoute>
                     <Home />
                   </PrivateRoute>
                 }
               />
+
+              {/* Public routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+
+              {/* Compatibility route */}
+              <Route path="/home" element={<Navigate to="/" replace />} />
 
               <Route
                 path="/fav"
@@ -88,8 +88,8 @@ function App() {
                 }
               />
 
-              {/* Catch-all: redirect unknown routes to /home */}
-              <Route path="*" element={<Navigate to="/home" />} />
+              {/* Catch-all: redirect unknown routes to homepage */}
+              <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </Layout>
         </Router>

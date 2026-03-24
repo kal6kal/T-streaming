@@ -5,6 +5,7 @@ import SearchBar from "../components/SearchBar/SearchBar";
 import GenreSection from "../components/GenreSection/GenreSection";
 import HeroBanner from "../components/HeroBanner/HeroBanner";
 import { Movie } from "../types/Movie";
+import { useBackButton } from "../hooks/useBackButton";
 
 const TMDB_KEY = process.env.REACT_APP_TMDB_API_KEY;
 const BASE_URL = "https://api.themoviedb.org/3";
@@ -13,6 +14,8 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [autocompleteResults, setAutocompleteResults] = useState<Movie[]>([]);
   const navigate = useNavigate();
+
+  useBackButton();
 
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
