@@ -18,7 +18,7 @@ Screenshots live in `src/assets/`. Paths below use URL encoding so spaces in fil
 ### Home
 
 <p align="center">
-  <img src="./src/assets/home%20page%20.png" alt="T-Streaming home page" width="88%" />
+  <img src="./src/assets/homepage%20.png" alt="T-Streaming home page" width="88%" />
 </p>
 
 ### Login
